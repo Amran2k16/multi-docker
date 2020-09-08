@@ -8,7 +8,7 @@ before_install:
 # Primary test running section. If anything here exits with a status code other than 0,
 # then travis ci is going to assume our build fails
 script:
-  - docker run amranprogramming/react-test npm test -- --coverage #the -- --coverage ensures test quite exits. We don't want it to hang
+  - docker run -e CI=true amranprogramming/react-test npm test
 
 after_success:
   - docker build -t amranprogramming/multi-client ./client
