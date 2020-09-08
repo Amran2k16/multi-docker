@@ -1,12 +1,12 @@
 sudo: required
+language: generic
+
 services:
   - docker
 
 before_install:
   - docker build -t amranprogramming/react-test -f ./client/Dockerfile.dev ./client
 
-# Primary test running section. If anything here exits with a status code other than 0,
-# then travis ci is going to assume our build fails
 script:
   - docker run -e CI=true amranprogramming/react-test npm test
 
@@ -15,22 +15,21 @@ after_success:
   - docker build -t amranprogramming/multi-nginx ./nginx
   - docker build -t amranprogramming/multi-server ./server
   - docker build -t amranprogramming/multi-worker ./worker
-  # Loginto our docker. Environment variables will be setup in travis CI
+  # Log in to the docker CLI
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
-  # Push those images to dockerhub
+  # Take those images and push them to docker hub
   - docker push amranprogramming/multi-client
   - docker push amranprogramming/multi-nginx
   - docker push amranprogramming/multi-server
   - docker push amranprogramming/multi-worker
 
 deploy:
-  edge: true
   provider: elasticbeanstalk
-  region: eu-west-1
-  app: multi-docker
-  env: MultiDocker-env
-  bucket_name: elasticbeanstalk-eu-west-1-432156860227
-  bucket_path: docker-multi
+  region: "eu-west-1"
+  app: "multi-docker"
+  env: "MultiDocker-env"
+  bucket_name: "elasticbeanstalk-eu-west-1-432156860227"
+  bucket_path: "docker-multi"
   on:
     branch: master
   access_key_id: $AWS_ACCESS_KEY
